@@ -1,0 +1,473 @@
+<h1 id="voronoi-diagram">voronoi diagram</h1>
+<p>
+B112040003 張景旭
+</p>
+<h2 id="-">軟體規格書</h2>
+<h3 id="-">輸入與輸出（資料）規格</h3>
+<p>本軟體之主要目的為：讀取一組或多組二維平面點資料，並計算其 Voronoi Diagram，最後於圖形介面中顯示。以下為資料輸入與輸出之正式規格說明。</p>
+<hr>
+<h3 id="1-input-specification-">1. 輸入資料規格（Input Specification）</h3>
+<h4 id="-">輸入來源</h4>
+<p>軟體支援兩種輸入方式：</p>
+<ol>
+<li><strong>檔案輸入（Input File）</strong></li>
+<li><strong>於畫布上以滑鼠點擊新增點</strong></li>
+</ol>
+<p>當同時存在兩者時，畫面上會以當前畫布內容作為 Voronoi 計算之輸入基準。</p>
+<hr>
+<h3 id="-">測試資料檔格式</h3>
+<p>輸入檔為純文字檔（<code>.txt</code>, <code>.in</code>, <code>.dat</code> 皆可），格式如下：</p>
+<pre><code>n
+x1 y1
+x2 y2
+<span class="hljs-bullet">...
+</span>xn yn
+n
+x1 y1
+<span class="hljs-bullet">...
+</span>0
+</code></pre><p>規格說明：</p>
+<ul>
+<li><code>n</code>：代表本批資料的點數（整數）。</li>
+<li>若 <code>n = 0</code>：代表輸入資料結束。</li>
+<li><code>xi yi</code>：代表第 <code>i</code> 個點的座標（浮點數）。</li>
+<li>支援空白行與以 <code>#</code> 開頭之註解行。</li>
+</ul>
+<h3 id="2-">2. 輸出資料規格</h3>
+<h4 id="-lexical-ordering-">輸出資料排序規範（Lexical Ordering）</h4>
+<p>輸出需依字典序排序：</p>
+<ol>
+<li><strong>所有點（P）依 (x, y) 由小到大排序。</strong></li>
+<li><strong>邊（E）需確保 (x1, y1) ≤ (x2, y2)</strong>  <ul>
+<li>若端點順序不符合規範，會自動交換。</li>
+</ul>
+</li>
+<li><strong>排序鍵：</strong></li>
+</ol>
+<h3 id="-">輸出格式</h3>
+<p>輸出檔為純文字檔，包含兩種資料行：</p>
+<ul>
+<li><code>P x y</code>：畫布中的一個輸入點。</li>
+<li><code>E x1 y1 x2 y2</code>：Voronoi Diagram 中的一條邊，使用其兩個端點座標表達。</li>
+</ul>
+<h4 id="-">視覺化輸出</h4>
+<p>在程式介面中，Voronoi Diagram 的視覺化輸出包含：</p>
+<ul>
+<li>輸入點（小圓點）</li>
+<li>Voronoi 邊（直線或線段）</li>
+<li>Divide-and-Conquer step-by-step 模式下：</li>
+<li>左子圖邊（藍色）</li>
+<li>右子圖邊（綠色）</li>
+<li>Hyperplane（紅色）</li>
+<li>Convex Hull（虛線）</li>
+</ul>
+<h2 id="-">功能規格與介面規格</h2>
+<p><img src="./img/1.png" alt="image"></p>
+<hr>
+<h3 id="1-functional-specification-">1. 功能規格（Functional Specification）</h3>
+<h4 id="1-1-">1.1 點資料管理</h4>
+<ul>
+<li>允許使用者以滑鼠點擊畫布新增點。</li>
+<li>支援從外部檔案分批讀入點資料（Batch Input）。</li>
+<li>自動過濾重複點（避免多點重疊造成錯誤）。</li>
+</ul>
+<hr>
+<h4 id="1-2-voronoi-diagram-run-">1.2 Voronoi Diagram 計算（Run）</h4>
+<ul>
+<li>以 Divide-and-Conquer 方法計算 Voronoi Diagram。</li>
+<li>若點數少於二點，不畫任何邊。</li>
+<li>輸出結果直接顯示於畫布上。</li>
+</ul>
+<hr>
+<h4 id="1-3-step-by-step-merge-">1.3 Step-by-step Merge 可視化</h4>
+<ul>
+<li>顯示 Divide-and-Conquer 在合併階段的每一層：<ul>
+<li>左子圖邊（藍色）</li>
+<li>右子圖邊（綠色）</li>
+<li>Hyperplane（紅色）</li>
+<li>左右 convex hull（虛線）</li>
+<li>參與合併的點顏色標記</li>
+</ul>
+</li>
+<li>可逐步觀察合併流程或直接跳到最後一步（Step to End）。</li>
+<li>可隨時重置（Reset Step）。</li>
+</ul>
+<hr>
+<h4 id="1-4-">1.4 輸出檔案保存</h4>
+<ul>
+<li>將畫布上的點與所有 Voronoi 邊輸出成統一格式的 <code>.txt</code> 檔。</li>
+<li>自動依 lexical order 排序，符合課程規範。</li>
+</ul>
+<hr>
+<h4 id="1-5-">1.5 畫布管理</h4>
+<ul>
+<li>Clear：清除畫布上所有內容。</li>
+<li>座標顯示：滑鼠移動時即時顯示座標。</li>
+<li>自動調整按鈕與畫布位置，介面配合視窗大小適當排列。</li>
+</ul>
+<hr>
+<h4 id="2-user-interface-specification-">2. 介面規格（User Interface Specification）</h4>
+<ul>
+<li><p><strong>畫布（Canvas）</strong><br>顯示所有點、邊、以及 Step-by-step 的視覺化元素。</p>
+</li>
+<li><p><strong>控制列（Control Panel）</strong><br>包含：</p>
+<ul>
+<li>Next Batch :讀入下一筆input</li>
+<li>Run  : 執行並顯示結果</li>
+<li>Clear : 清除畫面</li>
+<li>Step  : 執行下一步</li>
+<li>Step to End  : 顯示最後的結果(和run差在會顯示顏色和convex hull)</li>
+<li>Reset Step  : 回到執行前</li>
+</ul>
+</li>
+<li><p><strong>選單列（Menu Bar）</strong>  </p>
+<ul>
+<li>File：Open Input File、Load Next Batch、Open Output File、Save Output、Clear Canvas、Exit  </li>
+<li>Run（快速執行 Voronoi）  </li>
+</ul>
+</li>
+<li><p><strong>狀態列（Status Bar）</strong><br>顯示當前動作、訊息或系統狀態。</p>
+</li>
+</ul>
+<hr>
+<h2 id="-software-description-">軟體說明（Software Description）</h2>
+<p>本章提供本軟體之安裝方式、執行方法、使用流程，以及操作上需注意之要點。此說明文件以「exe 可執行檔版本」為主，使用者無須安裝 Python 或額外套件即可執行。</p>
+<hr>
+<h3 id="1-">1. 系統需求</h3>
+<ul>
+<li>Windows 10 或 Windows 11（64-bit）</li>
+<li>建議至少 8GB RAM</li>
+<li>不需安裝 Python（exe 已內含所有依賴）</li>
+<li>顯示器解析度建議至少 1280×720，以確保介面不會被擋住</li>
+</ul>
+<hr>
+<hr>
+<h4 id="2-">2. 執行方式</h4>
+<p>使用者可直接取得以下檔案：
+VoronoiProject.exe
+此檔案即為完整執行版本，不需額外安裝程式或函式庫。</p>
+<p>執行檔本身不依賴外部模組，因此不存在 DLL 或環境變數設定問題。
+雙擊：
+VoronoiProject.exe</p>
+<p>即可啟動軟體，</p>
+<hr>
+<h3 id="3-">3. 使用流程說明</h3>
+<h4 id="3-1-">3.1 新增點</h4>
+<p>使用者可採下列方式新增點至畫布：</p>
+<ol>
+<li>滑鼠左鍵點擊畫布位置  </li>
+<li>由測試檔以批次匯入（Next Batch）</li>
+</ol>
+<p>每個點會即時顯示於畫布上。</p>
+<hr>
+<h4 id="3-2-voronoi-diagram-run-">3.2 計算 Voronoi Diagram（Run）</h4>
+<p>點數準備完畢後，按下 <strong>Run</strong>：</p>
+<ul>
+<li>系統會自動去除重複點</li>
+<li>點數 n = 1 → 無邊  </li>
+<li>點數 n = 2 → 精確中垂線  </li>
+<li>點數 n = 3 → 精確三點 Voronoi  </li>
+<li>點數 n ≥ 4 → 使用 Divide-and-Conquer 演算法合成完整 Voronoi Diagram  </li>
+</ul>
+<p>結果之邊會立即繪於畫布中。</p>
+<hr>
+<h4 id="3-3-step-by-step-">3.3 Step-by-step 視覺化操作</h4>
+<p>此功能用來觀察 Divide-and-Conquer 的 <strong>合併階段</strong>。</p>
+<p>按下 <strong>Step</strong>：</p>
+<ol>
+<li>第一次按下 Step → 左右子圖的 convex hull（虛線）</li>
+<li>再按一次 Step → 合併後 convex hull（虛線）</li>
+<li>第三次按 Step → 進入下一個 merge step</li>
+<li>重複直到所有步驟結束</li>
+</ol>
+<p>額外按鈕：</p>
+<ul>
+<li><strong>Step to End</strong><br>直接跳到整棵遞迴樹最後一個 merge 的結果。</li>
+<li><strong>Reset Step</strong><br>退回到尚未按 Step 的初始畫面，只保留使用者輸入之點。</li>
+</ul>
+<hr>
+<h4 id="3-4-">3.4 匯入測試資料</h4>
+<p>選擇 File → Open Input File 後，可使用：</p>
+<h4 id="3-4-">3.4 匯入測試資料</h4>
+<p>選擇 File → Open Input File 後，可使用：</p>
+<p>Load Next Batch</p>
+<p>複製程式碼</p>
+<p>每次載入一組測資，格式如下：</p>
+<p>n
+x1 y1
+x2 y2
+...
+xn yn</p>
+<p>yaml
+複製程式碼</p>
+<p>n = 0 代表測試結束。</p>
+<hr>
+<h4 id="3-5-">3.5 匯出結果</h4>
+<p>按下：
+Save Output</p>
+<p>複製程式碼</p>
+<p>可將畫布目前的結果輸出為純文字檔：</p>
+<p>P x y
+E x1 y1 x2 y2</p>
+<p>yaml
+複製程式碼</p>
+<p>並自動依 lexical order 排序。</p>
+<h2 id="-">程式設計</h2>
+<h3 id="-">資料結構</h3>
+<h4 id="-point-"><code>Point</code>：平面座標點</h4>
+<pre><code class="lang-python="><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Point</span>:</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, x: float, y: float)</span>:</span>
+        self.x = float(x)
+        self.y = float(y)
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__repr__</span><span class="hljs-params">(self)</span>:</span>
+
+        <span class="hljs-keyword">return</span> f<span class="hljs-string">"P({self.x:.3f}, {self.y:.3f})"</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__eq__</span><span class="hljs-params">(self, other)</span>:</span>
+
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> isinstance(other, Point):
+            <span class="hljs-keyword">return</span> <span class="hljs-built_in">NotImplemented</span>
+        <span class="hljs-keyword">return</span> self.x == other.x <span class="hljs-keyword">and</span> self.y == other.y
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__lt__</span><span class="hljs-params">(self, other)</span>:</span>
+        <span class="hljs-string">"""
+        Lexical order
+        """</span>
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> isinstance(other, Point):
+            <span class="hljs-keyword">return</span> <span class="hljs-built_in">NotImplemented</span>
+        <span class="hljs-keyword">if</span> self.x != other.x:
+            <span class="hljs-keyword">return</span> self.x &lt; other.x
+        <span class="hljs-keyword">return</span> self.y &lt; other.y
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">distance_to</span><span class="hljs-params">(self, other)</span>:</span>
+        <span class="hljs-string">"""計算與另一點的距離"""</span>
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> isinstance(other, Point):
+            <span class="hljs-keyword">raise</span> TypeError(<span class="hljs-string">"distance_to() 需要 Point 類別作為參數"</span>)
+        dx = self.x - other.x
+        dy = self.y - other.y
+        <span class="hljs-keyword">return</span> (dx * dx + dy * dy) ** <span class="hljs-number">0.5</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">as_tuple</span><span class="hljs-params">(self)</span>:</span>
+        <span class="hljs-string">"""return (x, y) tuple"""</span>
+        <span class="hljs-keyword">return</span> (self.x, self.y)
+</code></pre>
+<p>代表平面上的一個「站點」（site），即 Voronoi Diagram 的輸入點。</p>
+<h4 id="edge-voronoi-">Edge：Voronoi 邊線段</h4>
+<pre><code class="lang-pytho="><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Edge</span>:</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(<span class="hljs-keyword">self</span>,
+                 <span class="hljs-symbol">start:</span> Point,
+                 <span class="hljs-symbol">end:</span> Point,
+                 <span class="hljs-symbol">left_polygon:</span> Optional[int] = None,
+                 <span class="hljs-symbol">right_polygon:</span> Optional[int] = None)</span></span>:
+        <span class="hljs-keyword">self</span>.start = start
+        <span class="hljs-keyword">self</span>.<span class="hljs-keyword">end</span> = <span class="hljs-keyword">end</span>
+        <span class="hljs-keyword">self</span>.left_polygon = left_polygon
+        <span class="hljs-keyword">self</span>.right_polygon = right_polygon
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__repr__</span><span class="hljs-params">(<span class="hljs-keyword">self</span>)</span></span>:
+
+        <span class="hljs-keyword">return</span> f<span class="hljs-string">"E({self.start.x:.3f},{self.start.y:.3f} → {self.end.x:.3f},{self.end.y:.3f})"</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__eq__</span><span class="hljs-params">(<span class="hljs-keyword">self</span>, other)</span></span>:
+
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> isinstance(other, Edge):
+            <span class="hljs-keyword">return</span> NotImplemented
+        <span class="hljs-keyword">return</span> (<span class="hljs-keyword">self</span>.start == other.start <span class="hljs-keyword">and</span> <span class="hljs-keyword">self</span>.<span class="hljs-keyword">end</span> == other.<span class="hljs-keyword">end</span>) <span class="hljs-keyword">or</span> \
+               (<span class="hljs-keyword">self</span>.start == other.<span class="hljs-keyword">end</span> <span class="hljs-keyword">and</span> <span class="hljs-keyword">self</span>.<span class="hljs-keyword">end</span> == other.start)
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__lt__</span><span class="hljs-params">(<span class="hljs-keyword">self</span>, other)</span></span>:
+        <span class="hljs-string">""</span><span class="hljs-string">"
+        Lexical order ：
+         (x1, y1, x2, y2)
+         x1≦x2 or x1=x2, y1≦y2
+        "</span><span class="hljs-string">""</span>
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> isinstance(other, Edge):
+            <span class="hljs-keyword">return</span> NotImplemented
+        s1, e1 = (<span class="hljs-keyword">self</span>.start, <span class="hljs-keyword">self</span>.<span class="hljs-keyword">end</span>)
+        s2, e2 = (other.start, other.<span class="hljs-keyword">end</span>)
+        <span class="hljs-keyword">if</span> s1 != <span class="hljs-symbol">s2:</span>
+            <span class="hljs-keyword">return</span> s1 &lt; s2
+        <span class="hljs-keyword">return</span> e1 &lt; e2
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">as_tuple</span><span class="hljs-params">(<span class="hljs-keyword">self</span>)</span></span>:
+        <span class="hljs-string">""</span><span class="hljs-string">"回傳 ((x1, y1), (x2, y2))，方便輸出或繪圖"</span><span class="hljs-string">""</span>
+        <span class="hljs-keyword">return</span> (<span class="hljs-keyword">self</span>.start.as_tuple(), <span class="hljs-keyword">self</span>.<span class="hljs-keyword">end</span>.as_tuple())
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">length</span><span class="hljs-params">(<span class="hljs-keyword">self</span>)</span></span>:
+        <span class="hljs-string">""</span><span class="hljs-string">"計算線段長度"</span><span class="hljs-string">""</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">self</span>.start.distance_to(<span class="hljs-keyword">self</span>.<span class="hljs-keyword">end</span>)
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">is_ray</span><span class="hljs-params">(<span class="hljs-keyword">self</span>, boundary_limit=<span class="hljs-number">600</span>)</span></span>:
+        <span class="hljs-string">""</span><span class="hljs-string">"
+        檢查是否延伸至畫布邊界的射線。
+        若端點在 [0, boundary_limit] 範圍外則視為射線。
+        "</span><span class="hljs-string">""</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">not</span> (<span class="hljs-number">0</span> &lt;= <span class="hljs-keyword">self</span>.start.x &lt;= boundary_limit <span class="hljs-keyword">and</span>
+                    <span class="hljs-number">0</span> &lt;= <span class="hljs-keyword">self</span>.start.y &lt;= boundary_limit <span class="hljs-keyword">and</span>
+                    <span class="hljs-number">0</span> &lt;= <span class="hljs-keyword">self</span>.<span class="hljs-keyword">end</span>.x &lt;= boundary_limit <span class="hljs-keyword">and</span>
+                    <span class="hljs-number">0</span> &lt;= <span class="hljs-keyword">self</span>.<span class="hljs-keyword">end</span>.y &lt;= boundary_limit)
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">has_point</span><span class="hljs-params">(<span class="hljs-keyword">self</span>, <span class="hljs-symbol">p:</span> Point, eps=<span class="hljs-number">1</span>e-<span class="hljs-number">6</span>)</span></span>:
+
+        cross = (p.y - <span class="hljs-keyword">self</span>.start.y) * (<span class="hljs-keyword">self</span>.<span class="hljs-keyword">end</span>.x - <span class="hljs-keyword">self</span>.start.x) - \
+                (p.x - <span class="hljs-keyword">self</span>.start.x) * (<span class="hljs-keyword">self</span>.<span class="hljs-keyword">end</span>.y - <span class="hljs-keyword">self</span>.start.y)
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> isclose(cross, <span class="hljs-number">0</span>.<span class="hljs-number">0</span>, abs_tol=eps):
+            <span class="hljs-keyword">return</span> False
+        dot = (p.x - <span class="hljs-keyword">self</span>.start.x) * (<span class="hljs-keyword">self</span>.<span class="hljs-keyword">end</span>.x - <span class="hljs-keyword">self</span>.start.x) + \
+              (p.y - <span class="hljs-keyword">self</span>.start.y) * (<span class="hljs-keyword">self</span>.<span class="hljs-keyword">end</span>.y - <span class="hljs-keyword">self</span>.start.y)
+        <span class="hljs-keyword">if</span> dot &lt; <span class="hljs-number">0</span>:
+            <span class="hljs-keyword">return</span> False
+        squared_len = (<span class="hljs-keyword">self</span>.<span class="hljs-keyword">end</span>.x - <span class="hljs-keyword">self</span>.start.x) ** <span class="hljs-number">2</span> + (<span class="hljs-keyword">self</span>.<span class="hljs-keyword">end</span>.y - <span class="hljs-keyword">self</span>.start.y) ** <span class="hljs-number">2</span>
+        <span class="hljs-keyword">return</span> dot &lt;= squared_len + eps
+</code></pre>
+<p>代表 Voronoi Diagram 中的一條線段（有限邊）。</p>
+<p>由兩個 Point 物件構成 start 與 end 端點。</p>
+<p>在演算法內部，各種幾何運算會產生或裁切線段，最後匯集成 Voronoi 邊集合：</p>
+<p>中垂線與畫布矩形的交點 → 建立 Edge</p>
+<p>對邊做 trimming 或 filter → 回傳新的 Edge 列表</p>
+<p>對 UI 端來說，只需知道有一組 Edge，即可直接畫在畫布上，達到「計算與顯示分離」的目的。</p>
+<h4 id="voronoidiagram-">VoronoiDiagram：一次子問題的結果</h4>
+<pre><code class="lang-python="><span class="hljs-keyword">from</span> dataclasses <span class="hljs-keyword">import</span> dataclass
+<span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> List, Optional
+
+<span class="hljs-meta">@dataclass</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">VoronoiDiagram</span>:</span>
+    edges: List[Edge]
+    hull: Optional[List[Point]] = <span class="hljs-keyword">None</span>
+</code></pre>
+<p>代表「某一個子問題（子集合點）的 Voronoi 結果」。</p>
+<p>欄位說明：</p>
+<p>edges：該子集合點的 Voronoi 邊（線段列表）。</p>
+<p>hull：該子集合點的 convex hull 頂點序列（Optional，可為 None）。</p>
+<p>在 divide-and-conquer 過程中：</p>
+<p>每次遞迴呼叫 _build_voronoi(...) 時，都回傳一個 VoronoiDiagram。</p>
+<p>merge 階段可同時使用左右子圖的 edges 與 hull 做合併與修剪。</p>
+<p>這個包裝類別讓「幾何結果」與「演算法層次」有明確界線，便於日後增加更多資訊（例如：Voronoi cell 結構、無限射線資訊等）。</p>
+<h4 id="mergestep-step-by-step-">MergeStep：Step-by-step 用的合併紀錄</h4>
+<pre><code class="lang-python=">@dataclass
+class MergeStep:
+    left_edges: <span class="hljs-keyword">List</span>[Edge]
+    right_edges: <span class="hljs-keyword">List</span>[Edge]
+    hyperplane_edges: <span class="hljs-keyword">List</span>[Edge]
+    left_hull: <span class="hljs-keyword">Optional</span>[<span class="hljs-keyword">List</span>[<span class="hljs-keyword">Point</span>]]
+    right_hull: <span class="hljs-keyword">Optional</span>[<span class="hljs-keyword">List</span>[<span class="hljs-keyword">Point</span>]]
+    merged_hull: <span class="hljs-keyword">Optional</span>[<span class="hljs-keyword">List</span>[<span class="hljs-keyword">Point</span>]]
+    median_x: <span class="hljs-keyword">Optional</span>[float] = <span class="hljs-keyword">None</span>
+    left_sites: <span class="hljs-keyword">Optional</span>[<span class="hljs-keyword">List</span>[<span class="hljs-keyword">Point</span>]] = <span class="hljs-keyword">None</span>
+    right_sites: <span class="hljs-keyword">Optional</span>[<span class="hljs-keyword">List</span>[<span class="hljs-keyword">Point</span>]] = <span class="hljs-keyword">None</span>
+</code></pre>
+<p>用途說明：</p>
+<p>為了支援「Step-by-step」視覺化，在每一層 merge 時額外記錄該層資訊。</p>
+<p>欄位意義：</p>
+<p>left_edges / right_edges：此層 merge 前，左右子圖保留下來的 Voronoi 邊。</p>
+<p>hyperplane_edges：由左右點群產生的「分隔鏈」（dividing hyperplane）邊集合。</p>
+<p>left_hull / right_hull：左右子圖各自的 convex hull（給 UI 畫虛線使用）。</p>
+<p>merged_hull：本層 merge 完成後的整體 convex hull。</p>
+<p>median_x：此層分割使用的 median 線之 x 座標（理論上可畫出分割線）。</p>
+<p>left_sites / right_sites：此層 merge 涉及的左右站點集合。</p>
+<p>UI 在按 Step 時，會依序讀取 MergeStep：</p>
+<p>先畫左、右 Voronoi + 左右 hull</p>
+<p>再畫 merged hull</p>
+<p>同時上色左右點</p>
+<h3 id="-">演算法</h3>
+<h4 id="1-divide-and-conquer-">1. Divide-and-Conquer 整體流程概述</h4>
+<p>整體演算法採用 Divide-and-Conquer（分而治之）方式建構 Voronoi Diagram。<br>基本概念如下：</p>
+<ol>
+<li><p><strong>先把所有輸入點依 X 座標排序（若 X 相同再依 Y）</strong><br>排序後可以用一刀將點分成左右兩半，並進一步遞迴處理。</p>
+</li>
+<li><p><strong>Divide（分割）階段</strong></p>
+<ul>
+<li>將排序後的點切成左半與右半。</li>
+<li>對左右點集合各自遞迴呼叫 Voronoi 建構程序。</li>
+<li>遞迴直到子問題只剩下極少數點。</li>
+</ul>
+</li>
+<li><p><strong>Merge（合併）階段</strong></p>
+<ul>
+<li>左右子圖都已完成後，再將它們的 Voronoi 邊、凸包與站點資訊融合。</li>
+<li>包含：  <ul>
+<li>利用 convex hull 找出左右圖的形狀與邊界。  </li>
+<li>建構 dividing hyperplane（左右圖的分隔鏈，簡稱 HP）。  </li>
+<li>依 HP 裁切左右子圖的 Voronoi 邊。  </li>
+<li>最後將左右邊 + HP 邊合併成完整的結果。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h4 id="2-divide-">2. Divide：點集合的遞迴切分</h4>
+<p>本專題的 Divide 方式非常簡單：</p>
+<ol>
+<li><p><strong>輸入點先排序</strong><br>排序後的序列被視為一維的可分割序列。</p>
+</li>
+<li><p><strong>取中間切點（median）進行分割</strong></p>
+<ul>
+<li>左半 = 前半部分的點  </li>
+<li>右半 = 後半部分的點  </li>
+<li>median 的座標（X）被記錄在 MergeStep 中供 UI 顯示或辨識。</li>
+</ul>
+</li>
+<li><p><strong>以遞迴方式處理左半與右半</strong></p>
+<ul>
+<li>遞迴繼續切分，直到點集合大小為 1 或 2。<ul>
+<li><strong>1 個點</strong> → 沒有 Voronoi 邊。  </li>
+<li><strong>2 個點</strong> → 直接產生這兩點的「中垂線」。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h4 id="3-merge-">3. Merge 整體概念</h4>
+<p>Merge 階段可分為四個核心步驟：</p>
+<ol>
+<li><strong>計算左右子圖的 convex hull（凸包）</strong></li>
+<li><strong>利用左右凸包尋找能作為 HP 起點的幾何關係</strong></li>
+<li><strong>構造 dividing hyperplane（HP）</strong></li>
+<li><strong>依 HP 修剪左右子圖的邊並合併</strong></li>
+</ol>
+<hr>
+<h4 id="merge-convex-hull">Merge：Convex Hull</h4>
+<ul>
+<li>輸入站點後，先依 <code>(x, y)</code> 排序</li>
+<li>建立上鏈（upper hull）與下鏈（lower hull）</li>
+<li>合併成 CCW（逆時針）的凸包序列</li>
+</ul>
+<hr>
+<h4 id="5-merge-dividing-hyperplane-hp-">5. Merge：Dividing Hyperplane（HP）的建構</h4>
+<h5 id="5-1-l-r-">5.1 利用所有 (L, R) 點對建立中垂線</h5>
+<p>對左半所有點 L<br>對右半所有點 R<br>計算它們的中垂線，並與畫布矩形求交。</p>
+<p>這會得到許多候選線段。</p>
+<h5 id="5-2-hp-">5.2 透過「最近兩（站）點」檢查找出真正屬於 HP 的部分</h5>
+<p>對每條候選線段，使用密集取樣與二分逼近法（binary refinement）：</p>
+<ul>
+<li>只保留「該位置的最近兩點剛好是 L 與 R」的線段區間  </li>
+<li>其他部分全部捨去  </li>
+<li>最後將所有有效區間組成 HP 的分段鏈（hyperplane edges）</li>
+</ul>
+<hr>
+<h4 id="6-merge-hp-">6. Merge：依 HP 裁切左右子圖</h4>
+<p>當 HP edge chain 建構完成後，左右子圖的邊會各自被裁切：</p>
+<ul>
+<li>任何邊只要落在 HP 不屬於自己的那一側 → 被移除  </li>
+<li>若邊穿越 HP → 會被分割成部分保留的線段  </li>
+</ul>
+<p>最後：</p>
+<ul>
+<li>左子圖的保留邊  </li>
+<li>右子圖的保留邊  </li>
+<li>HP 的所有鏈邊  </li>
+</ul>
+<p>三者合併成本層 Voronoi 結果。</p>
+<hr>
+<h4 id="7-merge-merged-hull-">7. Merge：產生合併後凸包（merged hull）</h4>
+<p>當左右子圖合併後，所有站點的凸包也能被一併重新計算：</p>
+<ul>
+<li>使用 monotone chain 計算整體 hull  </li>
+<li>作為下一層 merge 的輸入  </li>
+<li>Step-by-step 第二階段也會用這個 hull 視覺化</li>
+</ul>
