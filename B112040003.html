@@ -1,7 +1,5 @@
 <h1 id="voronoi-diagram">voronoi diagram</h1>
-<p>
-B112040003 張景旭
-</p>
+<p>B112040003 張景旭</p>
 <h2 id="-">軟體規格書</h2>
 <h3 id="-">輸入與輸出（資料）規格</h3>
 <p>本軟體之主要目的為：讀取一組或多組二維平面點資料，並計算其 Voronoi Diagram，最後於圖形介面中顯示。以下為資料輸入與輸出之正式規格說明。</p>
@@ -471,3 +469,22 @@ class MergeStep:
 <li>作為下一層 merge 的輸入  </li>
 <li>Step-by-step 第二階段也會用這個 hull 視覺化</li>
 </ul>
+<h2 id="-">軟體測試與實驗結果</h2>
+<h3 id="-">執行環境</h3>
+<ul>
+<li>compiler：python3.10</li>
+<li>作業系統：windows 11</li>
+<li>System Manufacturer:           Acer</li>
+<li>System Model:                  Nitro AN515-55</li>
+<li>Processor(s):                  1 Processor(s) Installed.</li>
+<li>Total Physical Memory:         16,215 MB</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/xCallmeEDtw/Termproject/refs/heads/main/img/out1.png" alt="image">
+<img src="https://raw.githubusercontent.com/xCallmeEDtw/Termproject/refs/heads/main/img/out2.png" alt="image"></p>
+<p>輸入與輸出檔案: <a href="https://github.com/xCallmeEDtw/Termproject/tree/main/testfile">https://github.com/xCallmeEDtw/Termproject/tree/main/testfile</a></p>
+<h2 id="-">結論與心得</h2>
+<p>整體而言，本次 Voronoi Diagram 專題讓我完整體驗了從演算法、資料結構到實際視覺化工具開發的流程。雖然divide-and-conquer 理論在許多細節上假設能以 O(n) 的方式找到切線與 hyperplane，但在實作層面，我的版本並沒有達到這樣的效率。為了保證穩定性，我以較直觀、較通用的方式處理 hyperplane 的判斷與裁切，甚至在 convex hull 的使用上也沒有做到理論上的 O(n) 合併。</p>
+<p>在開發過程中，最大的收穫不只是完成 Voronoi 圖，更是在一次次錯誤與邊界案例中理解演算法背後的幾何關係。例如重複點、線段裁切失敗、HP 消失造成洞等問題，都逼迫我重新檢查距離判斷與邊界處理的穩定性。這些問題讓我更深刻體會到，課堂上的演算法並不是直接照著寫就能跑得完美，真正的挑戰在於處理細節與例外情況。</p>
+<p>最終版本雖然不是最精簡或最優的幾何演算法實作，但穩定度、可視化過程、與 UI 操作經驗，讓整個專題變得完整且具教學意義。透過 step-by-step 模式，我也能更清楚觀察每次 merge 中資料結構的變化，這讓我對 Voronoi 的整體流程有了比課本更清楚的理解。</p>
+<h2 id="-">附錄</h2>
+<p>source code : <a href="https://github.com/xCallmeEDtw/Termproject/tree/main/VoronoiDiagram">https://github.com/xCallmeEDtw/Termproject/tree/main/VoronoiDiagram</a></p>
